@@ -2,6 +2,16 @@
 #include <fstream>
 #include "algorithms.hpp"
 
+void print_matrix(__int16_t** matrix, const __int16_t N) {
+    for (int i = 0; i < N; i++) {
+        for (int j = 0; j < N; j++) {
+            std::cout << matrix[i][j] << "\t";
+        }
+
+        std::cout << "\n";
+    }
+}
+
 int main(int argc, char* argv[]) {
     // проверка входных параметров
     if (argc < 2) {
@@ -31,13 +41,13 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    int N;
+    __int16_t N;
     fin >> N;
 
     // создание матрицы смежности
-    int** matrix = new int*[N];
+    __int16_t** matrix = new __int16_t*[N];
     for (int i = 0; i < N; i++) {
-        matrix[i] = new int[N];
+        matrix[i] = new __int16_t[N];
     }
 
     for (int i = 0; i < N; i++) {
@@ -48,7 +58,15 @@ int main(int argc, char* argv[]) {
 
     std::ofstream fout(FILE2);  // открытие выходного файла
 
-    Bellman_Ford(matrix, fout);
+    print_matrix(matrix, N);
+    bool good_graph = Bellman_Ford(matrix, N, fout, 0);
 
+    // проверка на наличие отрицательного цикла
+    if (good_graph == false) {
+        return 0;
+    }
+
+    Johnson(matrix, N, fout, 0);
+    
     return 0;
 }
