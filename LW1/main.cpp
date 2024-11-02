@@ -2,16 +2,6 @@
 #include <fstream>
 #include "algorithms.hpp"
 
-void print_matrix(__int16_t** matrix, const __int16_t N) {
-    for (int i = 0; i < N; i++) {
-        for (int j = 0; j < N; j++) {
-            std::cout << matrix[i][j] << "\t";
-        }
-
-        std::cout << "\n";
-    }
-}
-
 int main(int argc, char* argv[]) {
     // проверка входных параметров
     if (argc < 2) {
@@ -53,20 +43,47 @@ int main(int argc, char* argv[]) {
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < N; j++) {
             fin >> matrix[i][j];
+            if (matrix[i][j] == 0) {
+                matrix[i][j] = INF;
+            }
         }
     }
-
+    
     std::ofstream fout(FILE2);  // открытие выходного файла
 
+    // печать исходной матрицы смежности
+    std::cout << "Исходная матрица смежности:\n";
     print_matrix(matrix, N);
-    bool good_graph = Bellman_Ford(matrix, N, fout, 0);
 
-    // проверка на наличие отрицательного цикла
+    // применяем алгоритм Беллмана-Форда
+    int vertex = 0;
+    fout << "Результат работы алгоритма Беллмана-Форда:\n";
+    int distances[N];
+    bool good_graph = Bellman_Ford(matrix, N, vertex, distances);
+
+    // печать результата в файл
     if (good_graph == false) {
+        fout << "Граф содержит цикл с отрицательным весом.\n";
         return 0;
     }
 
+    fout << "Кратчайшие расстояния от вершины " << vertex << ":\n";
+    for (int i = 0; i < N; i++) {
+        if (i != vertex) {
+            if (distances[i] == INF) {
+                fout << "INF ";
+            } else {
+                fout << distances[i] << " ";
+            }
+        }
+    }
+    fout << "\n\n";
+    
+    // Применяем алгоритм Джонсона
+    fout << "Результат работы алгоритма Джонсона:\n";
     Johnson(matrix, N, fout, 0);
     
+    delete_matrix(matrix, N);
+
     return 0;
 }
