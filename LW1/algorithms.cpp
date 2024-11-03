@@ -5,7 +5,7 @@ void print_matrix(__int16_t** matrix, const __int16_t N) {
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < N; j++) {
             if (matrix[i][j] == INF) {
-                std::cout << "INF\t";
+                std::cout << "0\t";
             } 
             else {
                 std::cout << matrix[i][j] << "\t";
@@ -51,7 +51,7 @@ void Dijkstra(__int16_t** new_matrix, __int16_t** matrix, __int16_t N, const int
         visited[u] = true;
 
         for (int k = 0; k < N; k++) {
-            if (matrix[u][k] != 0 && !visited[k] && distances[u] != INF && distances[u] + new_matrix[u][k] < distances[k]) {
+            if (matrix[u][k] != INF && !visited[k] && distances[u] != INF && distances[u] + new_matrix[u][k] < distances[k]) {
                 distances[k] = distances[u] + new_matrix[u][k];
             }
         }
@@ -128,13 +128,6 @@ void Johnson(__int16_t** matrix, const __int16_t N, __int16_t** distance_table) 
         for (int j = 0; j < N; j++) {
             if (new_matrix[i][j] != INF) {
                 new_matrix[i][j] = new_matrix[i][j] + distances[i] - distances[j];
-            }
-            else {
-                new_matrix[i][j] = 0;
-            }
-
-            if (matrix[i][j]  == INF) {
-                matrix[i][j] = 0;
             }
         }
     }

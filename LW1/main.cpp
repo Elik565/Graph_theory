@@ -9,7 +9,7 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    if (argc == 3) {
+    if (argc == 3 || argc > 4) {
         std::cerr << "Ошибка входных параметров!\n";
         return 1;
     }
@@ -43,8 +43,8 @@ int main(int argc, char* argv[]) {
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < N; j++) {
             fin >> matrix[i][j];
-            if (matrix[i][j] == 0) {
-                matrix[i][j] = INF;
+            if (matrix[i][j] == 0) {  // отсутствие пути будем обозначать INF
+                matrix[i][j] = INF; 
             }
         }
     }
@@ -102,7 +102,8 @@ int main(int argc, char* argv[]) {
         fout << "\n";
     }
     fout << "\n\n";
-    
+
+    // завершение программы
     delete_matrix(matrix, N);
     fout.close();
 
