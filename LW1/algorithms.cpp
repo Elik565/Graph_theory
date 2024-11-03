@@ -51,7 +51,7 @@ void Dijkstra(__int16_t** new_matrix, __int16_t** matrix, __int16_t N, const int
         visited[u] = true;
 
         for (int k = 0; k < N; k++) {
-            if (matrix[u][k] != INF && !visited[k] && distances[u] != INF && distances[u] + new_matrix[u][k] < distances[k]) {
+            if (matrix[u][k] != 0 && !visited[k] && distances[u] != INF && distances[u] + new_matrix[u][k] < distances[k]) {
                 distances[k] = distances[u] + new_matrix[u][k];
             }
         }
@@ -69,7 +69,7 @@ bool Bellman_Ford(__int16_t** matrix, const __int16_t N, const int vertex, __int
     for (int k = 0; k < N - 1; k++) {
         for (int i = 0; i < N; i++) {
             for (int j = 0; j < N; j++) {
-                if (matrix[i][j] != INF && distances[i] != INF && (matrix[i][j] + distances[i]) < distances[j]) {
+                if (matrix[i][j] != 0 && distances[i] != INF && (matrix[i][j] + distances[i]) < distances[j]) {
                     distances[j] = distances[i] + matrix[i][j];
                 }
             }
@@ -79,7 +79,7 @@ bool Bellman_Ford(__int16_t** matrix, const __int16_t N, const int vertex, __int
     // проверка на цикл с отрицательным весом
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < N; j++) {
-            if (matrix[i][j] != INF && distances[i] != INF && distances[j] > matrix[i][j] + distances[i]) { 
+            if (matrix[i][j] != 0 && distances[i] != INF && distances[j] > matrix[i][j] + distances[i]) { 
                 return false;  // если смогли уменьшить расстояние
             }
         }
@@ -98,10 +98,7 @@ void Johnson(__int16_t** matrix, const __int16_t N, __int16_t** distance_table) 
     
     for (int i = 0; i < new_size; i++) {
         for (int j = 0; j < new_size; j++) {
-            if (j == N) {
-                new_matrix[i][j] = INF;
-            }
-            else if (i == N) {
+            if (j == N || i == N) {
                 new_matrix[i][j] = 0;
             }
             else {
@@ -170,3 +167,32 @@ void find_diameter(__int16_t** dist_matrix, const __int16_t N, __int16_t* diamet
 
     return;
 }
+
+//TODO может ли радиус быть отрицательным или нулевым
+void find_radius(__int16_t** dist_matrix, const __int16_t N, __int16_t* radius) {
+    __int16_t eccentricities[N] = {0};  // массив эксцентриситетов
+    eccentricities[0] = dist_matrix[0][0];
+    int destination;
+
+    for (int i = 0; i < N; i++) {
+        for (int j = 0; j < N; j++) {
+            if (dist_matrix[i][j] >= eccentricities[i]) {
+                eccentricities[i] = dist_matrix[i][j];  // находим эксцентриситет каждой вершины
+                destination = j;
+            }
+        }
+
+        if (i == 0) {
+            radius[0] = eccentricities[i];
+            radius[1] = i;
+            radius[2] = destination;
+        }
+        else if (eccentricities[i] < radius[0]) {
+            radius[0] = eccentricities[i];
+            radius[1] = i;
+            radius[2] = destination;
+        }
+    }
+
+    return;
+} 

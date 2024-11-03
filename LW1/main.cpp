@@ -43,9 +43,6 @@ int main(int argc, char* argv[]) {
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < N; j++) {
             fin >> matrix[i][j];
-            if (matrix[i][j] == 0) {  // отсутствие пути будем обозначать INF
-                matrix[i][j] = INF; 
-            }
         }
     }
     
@@ -70,7 +67,7 @@ int main(int argc, char* argv[]) {
     fout << "Кратчайшие расстояния от вершины " << vertex << ":\n";
     for (int i = 0; i < N; i++) {
         if (distances[i] == INF) {
-            fout << "INF ";
+            fout << "0 ";
         } 
         else {
             fout << distances[i] << " ";
@@ -78,7 +75,7 @@ int main(int argc, char* argv[]) {
     }
     fout << "\n\n";
     
-    // Применяем алгоритм Джонсона
+    // применяем алгоритм Джонсона
     __int16_t** distance_table = new __int16_t*[N];
     for (int i = 0; i < N; i++) {
         distance_table[i] = new __int16_t[N];
@@ -92,23 +89,27 @@ int main(int argc, char* argv[]) {
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < N; j++) {
             if (distance_table[i][j] == INF) {
-                fout << "0\t";
+                distance_table[i][j] = 0;
             }
-            else {
-                fout << distance_table[i][j] << "\t";
-            }
+            
+            fout << distance_table[i][j] << "\t";
         }
 
         fout << "\n";
     }
     fout << "\n";
 
-    // Поиск диаметра графа
+    // поиск диаметра графа
     __int16_t diameter[3] = {0};
     find_diameter(distance_table, N, diameter);
     fout << "Диаметр графа = " << diameter[0] << " от вершины " << diameter[1] << " до вершины " << diameter[2];
-    fout << ".\n\n";
+    fout << ".\n";
 
+    // поиск радиуса графа
+    __int16_t radius[3] = {0};
+    find_radius(distance_table, N, radius);
+    fout << "Радиус графа = " << radius[0] << " от вершины " << radius[1] << " до вершины " << radius[2];
+    fout << ".\n";
 
     // завершение программы
     delete_matrix(matrix, N);

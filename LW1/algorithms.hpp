@@ -20,5 +20,8 @@ bool Bellman_Ford(__int16_t** matrix, const __int16_t N, const int vertex, __int
 // Алгоритм Джонсона
 void Johnson(__int16_t** matrix, const __int16_t N, __int16_t** distance_table);
 
-// Поиск диаметра и соответствующих вершин 
+// Поиск диаметра и соответствующих ему вершин 
 void find_diameter(__int16_t** dist_matrix, const __int16_t N, __int16_t* diameter);
+
+// Поиск радиуса и соответствующих ему вершин
+void find_radius(__int16_t** dist_matrix, const __int16_t N, __int16_t* radius);
