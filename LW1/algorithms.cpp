@@ -69,7 +69,7 @@ bool Bellman_Ford(__int16_t** matrix, const __int16_t N, const int vertex, __int
     for (int k = 0; k < N - 1; k++) {
         for (int i = 0; i < N; i++) {
             for (int j = 0; j < N; j++) {
-                if (matrix[i][j] != 0 && distances[i] != INF && (matrix[i][j] + distances[i]) < distances[j]) {
+                if (matrix[i][j] != INF && distances[i] != INF && (matrix[i][j] + distances[i]) < distances[j]) {
                     distances[j] = distances[i] + matrix[i][j];
                 }
             }
@@ -79,7 +79,7 @@ bool Bellman_Ford(__int16_t** matrix, const __int16_t N, const int vertex, __int
     // проверка на цикл с отрицательным весом
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < N; j++) {
-            if (matrix[i][j] != 0 && distances[i] != INF && distances[j] > matrix[i][j] + distances[i]) { 
+            if (matrix[i][j] != INF && distances[i] != INF && distances[j] > matrix[i][j] + distances[i]) { 
                 return false;  // если смогли уменьшить расстояние
             }
         }
@@ -98,7 +98,10 @@ void Johnson(__int16_t** matrix, const __int16_t N, __int16_t** dist_matrix) {
     
     for (int i = 0; i < new_size; i++) {
         for (int j = 0; j < new_size; j++) {
-            if (j == N || i == N) {
+            if (j == N) {
+                new_matrix[i][j] = INF;
+            }
+            else if (i == N) {
                 new_matrix[i][j] = 0;
             }
             else {
@@ -197,6 +200,7 @@ void find_radius(__int16_t** dist_matrix, const __int16_t N, __int16_t* radius) 
     return;
 } 
 
+//TODO может ли совпадать множество центральных вершин с периферийным
 int find_central_vertices(__int16_t** dist_matrix, const __int16_t N, const __int16_t radius, int* vertices) {
     int count = 0;
 
@@ -204,6 +208,21 @@ int find_central_vertices(__int16_t** dist_matrix, const __int16_t N, const __in
         for (int j = i + 1; j < N; j++) {
             if (dist_matrix[i][j] == radius) {
                 vertices[i] = i;
+                count++;
+            }
+        }
+    }
+
+    return count;
+}
+
+int find_peripheral_vertices(__int16_t** dist_matrix, const __int16_t N, const __int16_t diameter, int* vertices) {
+    int count = 0;
+
+    for (int i = 0; i < N; i++) {
+        for (int j = i + 1; j < N; j++) {
+            if (dist_matrix[i][j] == diameter) {
+                vertices[count] = i;
                 count++;
             }
         }

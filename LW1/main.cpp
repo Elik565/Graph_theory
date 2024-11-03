@@ -53,7 +53,7 @@ int main(int argc, char* argv[]) {
     print_matrix(matrix, N);
 
     // применяем алгоритм Беллмана-Форда
-    int vertex = 0;
+    int vertex = 1;
     fout << "Результат работы алгоритма Беллмана-Форда:\n";
     __int16_t distances[N];
     bool good_graph = Bellman_Ford(matrix, N, vertex, distances);
@@ -119,6 +119,14 @@ int main(int argc, char* argv[]) {
         fout << vertices[i] << " ";
     }
     fout << "\n";
+
+    //поиск множества периферийных вершин
+    count = find_peripheral_vertices(dist_matrix, N, diameter[0], vertices);
+    fout << "Множество периферийных вершин: ";
+    for (int i = 0; i < count; i++) {
+        fout << vertices[i] << " ";
+    }
+    fout << "\n\nПрограмма успешно завершилась!";
 
     // завершение программы
     delete_matrix(matrix, N);
