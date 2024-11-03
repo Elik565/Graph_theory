@@ -168,7 +168,7 @@ void find_diameter(__int16_t** dist_matrix, const __int16_t N, __int16_t* diamet
     return;
 }
 
-//TODO может ли радиус быть отрицательным или нулевым
+//TODO может ли радиус быть отрицательным
 void find_radius(__int16_t** dist_matrix, const __int16_t N, __int16_t* radius) {
     __int16_t eccentricities[N] = {0};  // массив эксцентриситетов
     eccentricities[0] = dist_matrix[0][0];
@@ -176,7 +176,7 @@ void find_radius(__int16_t** dist_matrix, const __int16_t N, __int16_t* radius) 
 
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < N; j++) {
-            if (dist_matrix[i][j] >= eccentricities[i]) {
+            if (dist_matrix[i][j] >= eccentricities[i] && dist_matrix[i][j] != 0 || eccentricities[i] == 0) {
                 eccentricities[i] = dist_matrix[i][j];  // находим эксцентриситет каждой вершины
                 destination = j;
             }
