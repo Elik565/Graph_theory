@@ -43,6 +43,9 @@ int main(int argc, char* argv[]) {
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < N; j++) {
             fin >> matrix[i][j];
+            if (matrix[i][j] == 0) {  // отсутствие пути будем обозначать INF
+                matrix[i][j] = INF; 
+            }
         }
     }
     
@@ -53,7 +56,7 @@ int main(int argc, char* argv[]) {
     print_matrix(matrix, N);
 
     // применяем алгоритм Беллмана-Форда
-    int vertex = 1;
+    int vertex = 0;
     fout << "Результат работы алгоритма Беллмана-Форда:\n";
     __int16_t distances[N];
     bool good_graph = Bellman_Ford(matrix, N, vertex, distances);
@@ -112,19 +115,20 @@ int main(int argc, char* argv[]) {
     fout << ".\n";
 
     // поиск множества центральных вершин
-    int vertices[N];
+    std::set<int> vertices;
     int count = find_central_vertices(dist_matrix, N, radius[0], vertices);
     fout << "Множество центральных вершин: ";
-    for (int i = 0; i < count; i++) {
-        fout << vertices[i] << " ";
+    for (auto& vertex : vertices) {
+        fout << vertex << " ";
     }
     fout << "\n";
 
     //поиск множества периферийных вершин
+    vertices.clear();
     count = find_peripheral_vertices(dist_matrix, N, diameter[0], vertices);
     fout << "Множество периферийных вершин: ";
-    for (int i = 0; i < count; i++) {
-        fout << vertices[i] << " ";
+    for (auto vertex : vertices) {
+        fout << vertex << " ";
     }
     fout << "\n\nПрограмма успешно завершилась!";
 

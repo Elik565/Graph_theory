@@ -1,5 +1,6 @@
 #include <iostream>
 #include <limits>
+#include <set>
 
 #define INF std::numeric_limits<__int16_t>::max()
 
@@ -27,7 +28,7 @@ void find_diameter(__int16_t** dist_matrix, const __int16_t N, __int16_t* diamet
 void find_radius(__int16_t** dist_matrix, const __int16_t N, __int16_t* radius);
 
 // Поиск множества центральных вершин
-int find_central_vertices(__int16_t** dist_matrix, const __int16_t N, const __int16_t radius, int* vertices);
+int find_central_vertices(__int16_t** dist_matrix, const __int16_t N, const __int16_t radius, std::set<int>& vertices);
 
 // Поиск множества периферийных вершин
-int find_peripheral_vertices(__int16_t** dist_matrix, const __int16_t N, const __int16_t diameter, int* vertices);
+int find_peripheral_vertices(__int16_t** dist_matrix, const __int16_t N, const __int16_t diameter, std::set<int>& vertices);

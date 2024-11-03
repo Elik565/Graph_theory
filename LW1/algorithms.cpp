@@ -51,7 +51,7 @@ void Dijkstra(__int16_t** new_matrix, __int16_t** matrix, __int16_t N, const int
         visited[u] = true;
 
         for (int k = 0; k < N; k++) {
-            if (matrix[u][k] != 0 && !visited[k] && distances[u] != INF && distances[u] + new_matrix[u][k] < distances[k]) {
+            if (matrix[u][k] != INF && !visited[k] && distances[u] != INF && distances[u] + new_matrix[u][k] < distances[k]) {
                 distances[k] = distances[u] + new_matrix[u][k];
             }
         }
@@ -171,7 +171,6 @@ void find_diameter(__int16_t** dist_matrix, const __int16_t N, __int16_t* diamet
     return;
 }
 
-//TODO может ли радиус быть отрицательным
 void find_radius(__int16_t** dist_matrix, const __int16_t N, __int16_t* radius) {
     __int16_t eccentricities[N] = {0};  // массив эксцентриситетов
     eccentricities[0] = dist_matrix[0][0];
@@ -179,7 +178,7 @@ void find_radius(__int16_t** dist_matrix, const __int16_t N, __int16_t* radius) 
 
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < N; j++) {
-            if (dist_matrix[i][j] >= eccentricities[i] && dist_matrix[i][j] != 0 || eccentricities[i] == 0) {
+            if (dist_matrix[i][j] >= eccentricities[i]) {
                 eccentricities[i] = dist_matrix[i][j];  // находим эксцентриситет каждой вершины
                 destination = j;
             }
@@ -201,32 +200,40 @@ void find_radius(__int16_t** dist_matrix, const __int16_t N, __int16_t* radius) 
 } 
 
 //TODO может ли совпадать множество центральных вершин с периферийным
-int find_central_vertices(__int16_t** dist_matrix, const __int16_t N, const __int16_t radius, int* vertices) {
-    int count = 0;
+int find_central_vertices(__int16_t** dist_matrix, const __int16_t N, const __int16_t radius, std::set<int>& vertices) {
+    __int16_t eccentricities[N] = {0};  // массив эксцентриситетов
+    eccentricities[0] = dist_matrix[0][0];
 
     for (int i = 0; i < N; i++) {
-        for (int j = i + 1; j < N; j++) {
-            if (dist_matrix[i][j] == radius) {
-                vertices[i] = i;
-                count++;
+        for (int j = 0; j < N; j++) {
+            if (dist_matrix[i][j] >= eccentricities[i]) {
+                eccentricities[i] = dist_matrix[i][j];  // находим эксцентриситет каждой вершины
             }
+        }
+
+        if (eccentricities[i] == radius) {
+            vertices.insert(i);
         }
     }
 
-    return count;
+    return vertices.size();
 }
 
-int find_peripheral_vertices(__int16_t** dist_matrix, const __int16_t N, const __int16_t diameter, int* vertices) {
-    int count = 0;
+int find_peripheral_vertices(__int16_t** dist_matrix, const __int16_t N, const __int16_t diameter, std::set<int>& vertices) {
+    __int16_t eccentricities[N] = {0};  // массив эксцентриситетов
+    eccentricities[0] = dist_matrix[0][0];
 
     for (int i = 0; i < N; i++) {
-        for (int j = i + 1; j < N; j++) {
-            if (dist_matrix[i][j] == diameter) {
-                vertices[count] = i;
-                count++;
+        for (int j = 0; j < N; j++) {
+            if (dist_matrix[i][j] >= eccentricities[i]) {
+                eccentricities[i] = dist_matrix[i][j];  // находим эксцентриситет каждой вершины
             }
+        }
+
+        if (eccentricities[i] == diameter) {
+            vertices.insert(i);
         }
     }
 
-    return count;
+    return vertices.size();
 }
