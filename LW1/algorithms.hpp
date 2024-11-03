@@ -18,10 +18,13 @@ void Dijkstra(__int16_t** new_matrix, __int16_t** matrix, __int16_t N, const int
 bool Bellman_Ford(__int16_t** matrix, const __int16_t N, const int vertex, __int16_t* distances);
 
 // Алгоритм Джонсона
-void Johnson(__int16_t** matrix, const __int16_t N, __int16_t** distance_table);
+void Johnson(__int16_t** matrix, const __int16_t N, __int16_t** dist_matrix);
 
 // Поиск диаметра и соответствующих ему вершин 
 void find_diameter(__int16_t** dist_matrix, const __int16_t N, __int16_t* diameter);
 
 // Поиск радиуса и соответствующих ему вершин
 void find_radius(__int16_t** dist_matrix, const __int16_t N, __int16_t* radius);
+
+// Поиск множества центральных вершин
+int find_central_vertices(__int16_t** dist_matrix, const __int16_t N, const __int16_t radius, int* vertices);

@@ -76,23 +76,23 @@ int main(int argc, char* argv[]) {
     fout << "\n\n";
     
     // применяем алгоритм Джонсона
-    __int16_t** distance_table = new __int16_t*[N];
+    __int16_t** dist_matrix = new __int16_t*[N];
     for (int i = 0; i < N; i++) {
-        distance_table[i] = new __int16_t[N];
+        dist_matrix[i] = new __int16_t[N];
     }
 
-    Johnson(matrix, N, distance_table);
+    Johnson(matrix, N, dist_matrix);
     
     // печать результата в файл
     fout << "Результат работы алгоритма Джонсона:\n";
     fout << "Матрица расстояний:\n";
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < N; j++) {
-            if (distance_table[i][j] == INF) {
-                distance_table[i][j] = 0;
+            if (dist_matrix[i][j] == INF) {
+                dist_matrix[i][j] = 0;
             }
             
-            fout << distance_table[i][j] << "\t";
+            fout << dist_matrix[i][j] << "\t";
         }
 
         fout << "\n";
@@ -101,15 +101,24 @@ int main(int argc, char* argv[]) {
 
     // поиск диаметра графа
     __int16_t diameter[3] = {0};
-    find_diameter(distance_table, N, diameter);
+    find_diameter(dist_matrix, N, diameter);
     fout << "Диаметр графа = " << diameter[0] << " от вершины " << diameter[1] << " до вершины " << diameter[2];
     fout << ".\n";
 
     // поиск радиуса графа
     __int16_t radius[3] = {0};
-    find_radius(distance_table, N, radius);
+    find_radius(dist_matrix, N, radius);
     fout << "Радиус графа = " << radius[0] << " от вершины " << radius[1] << " до вершины " << radius[2];
     fout << ".\n";
+
+    // поиск множества центральных вершин
+    int vertices[N];
+    int count = find_central_vertices(dist_matrix, N, radius[0], vertices);
+    fout << "Множество центральных вершин: ";
+    for (int i = 0; i < count; i++) {
+        fout << vertices[i] << " ";
+    }
+    fout << "\n";
 
     // завершение программы
     delete_matrix(matrix, N);

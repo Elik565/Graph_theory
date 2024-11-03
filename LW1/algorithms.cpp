@@ -88,7 +88,7 @@ bool Bellman_Ford(__int16_t** matrix, const __int16_t N, const int vertex, __int
     return true;
 }   
  
-void Johnson(__int16_t** matrix, const __int16_t N, __int16_t** distance_table) {
+void Johnson(__int16_t** matrix, const __int16_t N, __int16_t** dist_matrix) {
     // создаем новую матрицу смежности с дополнительной вершиной
     int new_size = N + 1;
     __int16_t** new_matrix = new __int16_t*[N + 1];
@@ -134,16 +134,16 @@ void Johnson(__int16_t** matrix, const __int16_t N, __int16_t** distance_table) 
 
     // находим кратчайшие расстояния от каждой вершины
     for (int i = 0; i < N; i++) {
-        Dijkstra(new_matrix, matrix, N, i, distance_table[i]);
+        Dijkstra(new_matrix, matrix, N, i, dist_matrix[i]);
     }
 
     // восстанавливаем изначальные расстояния
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < N; j++) {
-            if (distance_table[i][j] == INF) 
+            if (dist_matrix[i][j] == INF) 
                 continue;
 
-            distance_table[i][j] += distances[j] - distances[i];
+            dist_matrix[i][j] += distances[j] - distances[i];
         }
     }
 
@@ -196,3 +196,18 @@ void find_radius(__int16_t** dist_matrix, const __int16_t N, __int16_t* radius) 
 
     return;
 } 
+
+int find_central_vertices(__int16_t** dist_matrix, const __int16_t N, const __int16_t radius, int* vertices) {
+    int count = 0;
+
+    for (int i = 0; i < N; i++) {
+        for (int j = i + 1; j < N; j++) {
+            if (dist_matrix[i][j] == radius) {
+                vertices[i] = i;
+                count++;
+            }
+        }
+    }
+
+    return count;
+}
