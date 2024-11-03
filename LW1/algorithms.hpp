@@ -12,10 +12,10 @@ void print_matrix(__int16_t** matrix, const __int16_t N);
 void delete_matrix(__int16_t** matrix, const __int16_t N);
 
 // Алгоритм Дейкстры
-void Dijkstra(__int16_t** matrix, const __int16_t N, const int vertex, int* distances);
+void Dijkstra(__int16_t** new_matrix, __int16_t** matrix, __int16_t N, const int vertex, __int16_t* distances);
 
 // Алгоритм Беллмана-Форда
-bool Bellman_Ford(__int16_t** matrix, const __int16_t N, const int vertex, int* distances);
+bool Bellman_Ford(__int16_t** matrix, const __int16_t N, const int vertex, __int16_t* distances);
 
 // Алгоритм Джонсона
-void Johnson(__int16_t** matrix, const __int16_t N, std::ofstream& fout, const int vertex);
+void Johnson(__int16_t** matrix, const __int16_t N, __int16_t** distance_table);

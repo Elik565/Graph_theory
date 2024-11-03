@@ -58,7 +58,7 @@ int main(int argc, char* argv[]) {
     // применяем алгоритм Беллмана-Форда
     int vertex = 0;
     fout << "Результат работы алгоритма Беллмана-Форда:\n";
-    int distances[N];
+    __int16_t distances[N];
     bool good_graph = Bellman_Ford(matrix, N, vertex, distances);
 
     // печать результата в файл
@@ -69,21 +69,42 @@ int main(int argc, char* argv[]) {
 
     fout << "Кратчайшие расстояния от вершины " << vertex << ":\n";
     for (int i = 0; i < N; i++) {
-        if (i != vertex) {
-            if (distances[i] == INF) {
-                fout << "INF ";
-            } else {
-                fout << distances[i] << " ";
-            }
+        if (distances[i] == INF) {
+            fout << "INF ";
+        } 
+        else {
+            fout << distances[i] << " ";
         }
     }
     fout << "\n\n";
     
     // Применяем алгоритм Джонсона
+    __int16_t** distance_table = new __int16_t*[N];
+    for (int i = 0; i < N; i++) {
+        distance_table[i] = new __int16_t[N];
+    }
+
+    Johnson(matrix, N, distance_table);
+    
+    // печать результата в файл
     fout << "Результат работы алгоритма Джонсона:\n";
-    Johnson(matrix, N, fout, 0);
+    fout << "Матрица расстояний:\n";
+    for (int i = 0; i < N; i++) {
+        for (int j = 0; j < N; j++) {
+            if (distance_table[i][j] == INF) {
+                fout << "0\t";
+            }
+            else {
+                fout << distance_table[i][j] << "\t";
+            }
+        }
+
+        fout << "\n";
+    }
+    fout << "\n\n";
     
     delete_matrix(matrix, N);
+    fout.close();
 
     return 0;
 }
