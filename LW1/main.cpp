@@ -101,7 +101,14 @@ int main(int argc, char* argv[]) {
 
         fout << "\n";
     }
-    fout << "\n\n";
+    fout << "\n";
+
+    // Поиск диаметра графа
+    __int16_t diameter[3] = {0};
+    find_diameter(distance_table, N, diameter);
+    fout << "Диаметр графа = " << diameter[0] << " от вершины " << diameter[1] << " до вершины " << diameter[2];
+    fout << ".\n\n";
+
 
     // завершение программы
     delete_matrix(matrix, N);

@@ -154,3 +154,19 @@ void Johnson(__int16_t** matrix, const __int16_t N, __int16_t** distance_table) 
 
     return;
 }
+
+void find_diameter(__int16_t** dist_matrix, const __int16_t N, __int16_t* diameter) {
+    diameter[0] = dist_matrix[0][0];
+
+    for (int i = 0; i < N; i++) {
+        for (int j = 0; j < N; j++) {
+            if (dist_matrix[i][j] > diameter[0]) {
+                diameter[0] = dist_matrix[i][j];
+                diameter[1] = i;
+                diameter[2] = j;
+            }
+        }
+    }
+
+    return;
+}
