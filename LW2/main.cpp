@@ -1,85 +1,147 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
-#include <cstring>
 #include <climits>
+#include <queue>
+#include <sstream>
+#include <unordered_map>
+
+using namespace std;
 
 struct Edge {
     int to;
     int capacity;
-    Edge* reverse;
+    int flow;
+    Edge(int t, int c) : to(t), capacity(c), flow(0) {}
 };
 
-struct Graph {
-    int vertex_count;
-    std::vector<Edge*>* adj_list;
+class Graph {
+public:
+    int V;
+    vector<Edge>* adj;
+    unordered_map<int, int> in_degree;  // Количество входящих рёбер для каждой вершины
+    unordered_map<int, int> out_degree; // Количество исходящих рёбер для каждой вершины
+
+    Graph(int V) {
+        this->V = V;
+        adj = new vector<Edge>[V];
+    }
+
+    void addEdge(int u, int v, int capacity) {
+        adj[u].push_back(Edge(v, capacity));
+        adj[v].push_back(Edge(u, 0));  // Обратное ребро с нулевой пропускной способностью
+        out_degree[u]++;
+        in_degree[v]++;
+    }
+
+    bool bfs(int s, int t, vector<int>& parent) {
+        vector<bool> visited(V, false);
+        queue<int> q;
+        q.push(s);
+        visited[s] = true;
+
+        while (!q.empty()) {
+            int node = q.front();
+            q.pop();
+
+            for (int i = 0; i < adj[node].size(); ++i) {
+                int v = adj[node][i].to;
+                int capacity = adj[node][i].capacity - adj[node][i].flow;
+                if (!visited[v] && capacity > 0) {
+                    parent[v] = node;
+                    if (v == t) {
+                        return true;
+                    }
+                    visited[v] = true;
+                    q.push(v);
+                }
+            }
+        }
+        return false;
+    }
+
+    int fordFulkerson(int s, int t) {
+        vector<int> parent(V, -1);
+        int maxFlow = 0;
+
+        while (bfs(s, t, parent)) {
+            int pathFlow = INT_MAX;
+            for (int v = t; v != s; v = parent[v]) {
+                int u = parent[v];
+                for (Edge& edge : adj[u]) {
+                    if (edge.to == v) {
+                        pathFlow = min(pathFlow, edge.capacity - edge.flow);
+                        break;
+                    }
+                }
+            }
+
+            for (int v = t; v != s; v = parent[v]) {
+                int u = parent[v];
+                for (Edge& edge : adj[u]) {
+                    if (edge.to == v) {
+                        edge.flow += pathFlow;
+                        break;
+                    }
+                }
+                for (Edge& edge : adj[v]) {
+                    if (edge.to == u) {
+                        edge.flow -= pathFlow;
+                        break;
+                    }
+                }
+            }
+
+            maxFlow += pathFlow;
+        }
+
+        return maxFlow;
+    }
+
+    void printFlow(ofstream& outFile) {
+        for (int u = 0; u < V; ++u) {
+            for (Edge& edge : adj[u]) {
+                if (edge.capacity > 0 && edge.flow > 0) {
+                    outFile << "(" << u << ", " << edge.to << ", " << edge.flow << ")\n";
+                }
+            }
+        }
+    }
+
+    pair<int, int> findSourceSink() {
+        int source = -1, sink = -1;
+        for (int i = 0; i < V; ++i) {
+            // Ищем вершину с наибольшим количеством исходящих рёбер (предположительно исходная)
+            if (out_degree[i] > 0 && in_degree[i] == 0) {
+                source = i;
+            }
+            // Ищем вершину с наибольшим количеством входящих рёбер (предположительно сток)
+            if (in_degree[i] > 0 && out_degree[i] == 0) {
+                sink = i;
+            }
+        }
+        return {source, sink};
+    }
 };
 
-Graph* create_graph(int vertex_count) {
-    Graph* graph = new Graph;
-    graph->vertex_count = vertex_count;
-    graph->adj_list = new std::vector<Edge*>[vertex_count];
+Graph readGraph(const string& filename) {
+    ifstream inFile(filename);
+    int V, u, v, capacity;
+    inFile >> V;
+
+    Graph graph(V);
+    while (inFile >> u >> v >> capacity) {
+        graph.addEdge(u, v, capacity);
+    }
+
     return graph;
 }
 
-void add_edge(Graph* graph, int from, int to, int capacity) {
-    Edge* forward = new Edge{to, capacity, nullptr};
-    Edge* backward = new Edge{from, 0, forward};
-    forward->reverse = backward;
-    graph->adj_list[from].push_back(forward);
-    graph->adj_list[to].push_back(backward);
-}
-
-bool dfs(Graph* graph, int source, int sink, Edge** path, bool* visited) {
-    if (source == sink) return true;
-
-    visited[source] = true;
-    for (Edge* edge : graph->adj_list[source]) {
-        if (!visited[edge->to] && edge->capacity > 0) {
-            path[edge->to] = edge;
-            if (dfs(graph, edge->to, sink, path, visited)) return true;
-        }
-    }
-    return false;
-}
-
-int ford_fulkerson(Graph* graph, int source, int sink) {
-    int max_flow = 0;
-    Edge** path = new Edge*[graph->vertex_count];
-    bool* visited = new bool[graph->vertex_count];
-
-    while (true) {
-        std::fill(path, path + graph->vertex_count, nullptr);
-        std::fill(visited, visited + graph->vertex_count, false);
-
-        if (!dfs(graph, source, sink, path, visited)) break;
-
-        int flow = INT_MAX;
-        for (int v = sink; v != source; v = path[v]->reverse->to) {
-            flow = std::min(flow, path[v]->capacity);
-        }
-
-        for (int v = sink; v != source; v = path[v]->reverse->to) {
-            path[v]->capacity -= flow;
-            path[v]->reverse->capacity += flow;
-        }
-
-        max_flow += flow;
-    }
-
-    delete[] path;
-    delete[] visited;
-    return max_flow;
-}
-
-void free_graph(Graph* graph) {
-    for (int i = 0; i < graph->vertex_count; ++i) {
-        for (Edge* edge : graph->adj_list[i]) {
-            delete edge;
-        }
-    }
-    delete[] graph->adj_list;
-    delete graph;
+void writeResults(const string& outputFile, int maxFlow, Graph& graph) {
+    ofstream outFile(outputFile);
+    outFile << "Величина максимального потока: " << maxFlow << endl;
+    outFile << "Потоки:" << endl;
+    graph.printFlow(outFile);
 }
 
 int main(int argc, char* argv[]) {
@@ -104,29 +166,22 @@ int main(int argc, char* argv[]) {
 
     // работа с входным файлом
     const char* FILE1 = argv[1];
-    std::ifstream fin(FILE1);
 
-    if (!fin) {
-        std::cerr << "Ошибка открытия файла!\n";
+    Graph graph = readGraph(FILE1);
+
+    // Находим исходную и стоковую вершины
+    pair<int, int> sourceSink = graph.findSourceSink();
+    int source = sourceSink.first;
+    int sink = sourceSink.second;
+
+    if (source == -1 || sink == -1) {
+        cout << "Source or Sink vertex not found!" << endl;
         return 1;
     }
 
-    int16_t vertex_count;
-    fin.read(reinterpret_cast<char*>(&vertex_count), sizeof(vertex_count));
+    // Выполняем алгоритм Форда-Фалкерсона
+    int maxFlow = graph.fordFulkerson(source, sink);
+    writeResults(FILE2, maxFlow, graph);
 
-    Graph* graph = create_graph(vertex_count);
-
-    int16_t from, to, capacity;
-    while (fin.read(reinterpret_cast<char*>(&from), sizeof(from)) &&
-           fin.read(reinterpret_cast<char*>(&to), sizeof(to)) &&
-           fin.read(reinterpret_cast<char*>(&capacity), sizeof(capacity))) {
-        add_edge(graph, from, to, capacity);
-    }
-
-    int source = 0; // Исток
-    int sink = vertex_count - 1; // Сток
-    std::cout << "Максимальный поток: " << ford_fulkerson(graph, source, sink) << std::endl;
-
-    free_graph(graph);
     return 0;
 }
